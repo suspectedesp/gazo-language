@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <regex>
 
-int calculate(const std::string &expression) {
+int calculate(const std::string& expression) {
     std::regex pattern("(-?\\d+)\\s*([-+*/])\\s*(-?\\d+)");
     std::smatch match;
     if (std::regex_match(expression, match, pattern)) {
@@ -14,41 +14,42 @@ int calculate(const std::string &expression) {
 
         int result;
         switch (op) {
-            case '+':
-                result = operand1 + operand2;
-                break;
-            case '-':
-                result = operand1 - operand2;
-                break;
-            case '*':
-                result = operand1 * operand2;
-                break;
-            case '/':
-                result = operand1 / operand2;
-                break;
-            default:
-                std::cerr << "Error: Invalid operator." << std::endl;
-                return 0;
+        case '+':
+            result = operand1 + operand2;
+            break;
+        case '-':
+            result = operand1 - operand2;
+            break;
+        case '*':
+            result = operand1 * operand2;
+            break;
+        case '/':
+            result = operand1 / operand2;
+            break;
+        default:
+            std::cerr << "Error: Invalid operator." << std::endl;
+            return 0;
         }
-        
+
         if (result < -100 || result > 100) {
             std::cerr << "[RUNTIME ERROR]: Da Gazo aus der Volkschule gedropped ist kann er nur Rechnungen mit Ergebnissen zwischen -100 und 100 berechnen" << std::endl;
             return 0;
         }
 
         return result;
-    } else {
+    }
+    else {
         std::cerr << "[RUNTIME ERROR]: Da Gazo aus der Volkschule gedropped ist kann er nur bis zu zwei Zahlen auf einmal berechnen" << std::endl;
         return 0;
-        
-        /* 
+
+        /*
         std::cerr << "Error: Invalid expression: " << expression << std::endl;
-        return 0; 
+        return 0;
         */
     }
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
     if (argc != 3 || std::string(argv[1]) != "--f") {
         std::cerr << "Usage: " << argv[0] << " --f input_file.gazo" << std::endl;
         return 1;
