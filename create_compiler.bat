@@ -1,0 +1,1 @@
+gcc -std=c++11 -o compiler main.cpp -lstdc++
