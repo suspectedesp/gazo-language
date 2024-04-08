@@ -7,13 +7,13 @@
 
 int main(int argc, char* argv[]) {
     if (argc != 3 || std::string(argv[1]) != "--f") {
-        std::cerr << "Usage: " << argv[0] << " --f input_file.gazo" << std::endl;
+        std::cerr << "[Gazo-Compiler Error] | Usage: " << argv[0] << " --f input_file.gazo" << std::endl;
         return 1;
     }
 
     std::ifstream inputFile(argv[2]);
     if (!inputFile) {
-        std::cerr << "Error: Couldn't open input file." << std::endl;
+        std::cerr << "[Gazo-Compiler Error] | Couldn't open input file" << std::endl;
         return 1;
     }
 
@@ -22,6 +22,12 @@ int main(int argc, char* argv[]) {
         // Skip empty lines
         if (line.empty()) {
             continue;
+        }
+
+        // 187 EOL
+        if (line.substr(line.size() - 3) != "187") {
+            std::cerr << "[Gazo-Compiler Error] | Jede Zeile (ausser leere Zeilen) muss mit 187 als EOL enden" << std::endl;
+            return 1;
         }
 
         if (line.find("gazo.sagen") != std::string::npos) {
@@ -37,10 +43,10 @@ int main(int argc, char* argv[]) {
                 size_t closeParen = message.find(")");
                 std::string expression = message.substr(openParen + 1, closeParen - openParen - 1);
                 // std::cout << message << std::endl; // aka gazo.rechnen(whatever)
-                // std::cout << expression << std::endl; // aka the expresion (whatever)
+                // std::cout << expression << std::endl; // aka the expresion (->whatever)
                 int result = calculate(expression);
                 if (result != 1) {
-                    // std::cout << result << std::endl; // not sure if result should get printed or just stored as variable so you can then use it later on in the code
+                    // std::cout << result << std::endl; // not sure if result should get printed or just stored as variable so you can then use it later on in the code | duplicate at line 59
                 }
             }
             else {
@@ -56,7 +62,7 @@ int main(int argc, char* argv[]) {
             std::string expression = line.substr(openParen + 1, closeParen - openParen - 1);
             int result = calculate(expression);
             if (result != 1) {
-                std::cout << result << std::endl;
+                // std::cout << result << std::endl; // not sure if result should get printed or just stored as variable so you can then use it later on in the code | duplicate at line 43
             }
         }
         // Handle other types of lines
