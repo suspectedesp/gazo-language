@@ -20,7 +20,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="calculate.hpp">
+    <ClInclude Include="src\calculate.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

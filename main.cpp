@@ -3,7 +3,7 @@
 #include <string>
 #include <cstdlib>
 #include <regex>
-#include "calculate.hpp"
+#include "src/calculate.hpp"
 
 int main(int argc, char* argv[]) {
     if (argc != 3 || std::string(argv[1]) != "--f") {
