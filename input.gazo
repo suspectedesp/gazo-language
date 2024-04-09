@@ -1,6 +1,7 @@
 gazo.sagen("Hello, world!")187
 gazo.rechnen(1+1+1)187
-gazo.sagen("gazo.rechnen(1+1)")187
+gazo.sagen("gazo.rechnen(2+2)")187
 gazo.rechnen(100+1)187
-gazo.idk()187
 gazo.rechnen(1+1)187
+gazo.lesen("2", "test.txt")187
+gazo.idk()187
