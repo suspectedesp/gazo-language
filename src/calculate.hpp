@@ -36,7 +36,6 @@ int calculate(const std::string& expression) {
             std::cerr << "[RUNTIME ERROR]: Da Gazo aus der Volkschule gedropped ist kann er nur Rechnungen mit Ergebnissen zwischen -100 und 100 berechnen" << std::endl;
             return 1;
         }
-
         return result;
     }
     else {

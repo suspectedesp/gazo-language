@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <regex>
 #include "src/calculate.hpp"
+#include "src/file_writing.hpp"
 
 int main(int argc, char* argv[]) {
     if (argc != 3 || std::string(argv[1]) != "--f") {
@@ -46,7 +47,7 @@ int main(int argc, char* argv[]) {
                 // std::cout << expression << std::endl; // aka the expresion (->whatever)
                 int result = calculate(expression);
                 if (result != 1) {
-                    // std::cout << result << std::endl; // not sure if result should get printed or just stored as variable so you can then use it later on in the code | duplicate at line 59
+                    std::cout << result << std::endl;
                 }
             }
             else {
@@ -62,10 +63,39 @@ int main(int argc, char* argv[]) {
             std::string expression = line.substr(openParen + 1, closeParen - openParen - 1);
             int result = calculate(expression);
             if (result != 1) {
-                // std::cout << result << std::endl; // not sure if result should get printed or just stored as variable so you can then use it later on in the code | duplicate at line 43
+                // std::cout << result << std::endl; // not sure if result should get printed or just stored as variable so you can then use it later on in the code
             }
         }
-        // Handle other types of lines
+        else if (line.find("gazo.lesen") != std::string::npos) {
+            size_t openParen = line.find("(");
+            size_t commaPos = line.find(",");
+            size_t closeParen = line.find(")");
+
+            // Check if necessary separators found
+            if (openParen == std::string::npos || commaPos == std::string::npos || closeParen == std::string::npos) {
+                std::cerr << "[Gazo-Compiler Error] | Invalid syntax in gazo.lesen command" << std::endl;
+                return 1;
+            }
+
+            // Extracting arguments
+            std::string argument = line.substr(openParen + 1, commaPos - openParen - 1);
+            std::string file_name = line.substr(commaPos + 3, closeParen - commaPos - 4);
+
+            int lines_to_read = -1; // Default = read all lines
+            if (!argument.empty()) {
+                argument.erase(std::remove(argument.begin(), argument.end(), '\"'), argument.end());
+                if (std::regex_match(argument, std::regex("\\d+"))) {
+                    lines_to_read = std::stoi(argument);
+                }
+                else {
+                    std::cerr << "[Gazo-Compiler Error] | Invalid argument for number of lines to read" << std::endl;
+                    return 1;
+                }
+            }
+
+            read(file_name, lines_to_read);
+        }
+
         else {
             std::cerr << "[RUNTIME ERROR]: Gazo hat keine Ahnung was du von ihm willst" << std::endl;
         }
