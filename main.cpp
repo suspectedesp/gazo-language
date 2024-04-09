@@ -3,8 +3,22 @@
 #include <string>
 #include <cstdlib>
 #include <regex>
+#include <unordered_map>
 #include "src/calculate.hpp"
 #include "src/file_writing.hpp"
+#include "src/process_message.hpp"
+std::map<std::string, int> variables;
+
+int evaluateExpression(const std::string& expression) {
+    std::string exp = expression;
+    for (const auto& pair : variables) {
+        size_t pos;
+        while ((pos = exp.find(pair.first)) != std::string::npos) {
+            exp.replace(pos, pair.first.length(), std::to_string(pair.second));
+        }
+    }
+    return calculate(exp);
+}
 
 int main(int argc, char* argv[]) {
     if (argc != 3 || std::string(argv[1]) != "--f") {
@@ -20,8 +34,8 @@ int main(int argc, char* argv[]) {
 
     std::string line;
     while (std::getline(inputFile, line)) {
-        // Skip empty lines
-        if (line.empty()) {
+        // Skip empty lines or lines starting with //
+        if (line.empty() || line.substr(0, 2) == "//") {
             continue;
         }
 
@@ -32,40 +46,76 @@ int main(int argc, char* argv[]) {
         }
 
         if (line.find("gazo.sagen") != std::string::npos) {
-            // Extract string to be outputted
+            // Extract string
             size_t startQuote = line.find("\"");
             size_t endQuote = line.find("\"", startQuote + 1);
-            std::string message = line.substr(startQuote + 1, endQuote - startQuote - 1);
 
-            // Check if the message starts with "gazo.rechnen"
-            if (message.find("gazo.rechnen") == 0) {
-                // previous bug: used line instead of message after this line, dont repeat stupidness
-                size_t openParen = message.find("(");
-                size_t closeParen = message.find(")");
-                std::string expression = message.substr(openParen + 1, closeParen - openParen - 1);
-                // std::cout << message << std::endl; // aka gazo.rechnen(whatever)
-                // std::cout << expression << std::endl; // aka the expresion (->whatever)
-                int result = calculate(expression);
-                if (result != 1) {
-                    std::cout << result << std::endl;
-                }
+            // Check if message has double quotes
+            std::string message;
+            if (startQuote != std::string::npos && endQuote != std::string::npos) {
+                message = line.substr(startQuote + 1, endQuote - startQuote - 1);
             }
             else {
-                // Print the message as it is
+                size_t startSingleQuote = line.find("'");
+                size_t endSingleQuote = line.find("'", startSingleQuote + 1);
+                if (startSingleQuote != std::string::npos && endSingleQuote != std::string::npos) {
+                    std::string varName = line.substr(startSingleQuote + 1, endSingleQuote - startSingleQuote - 1);
+                    if (variables.find(varName) != variables.end()) {
+                        message = std::to_string(variables[varName]);
+                    }
+                    else {
+                        std::cerr << "Variable '" << varName << "' not found." << std::endl;
+                        continue; // Skip processing
+                    }
+                }
+                else {
+                    std::cerr << "Invalid syntax in gazo.sagen command." << std::endl;
+                    continue; // Skip processing
+                }
+            }
+
+            if (message.find("gazo.rechnen") == 0) {
+                processMessage(message);
+            }
+            else {
                 std::cout << message << std::endl;
             }
         }
-        // Check if the line contains gazo.rechnen
+        // Check if it contains gazo.rechnen
         else if (line.find("gazo.rechnen") != std::string::npos) {
-            // Extract the expression to be evaluated
             size_t openParen = line.find("(");
             size_t closeParen = line.find(")");
             std::string expression = line.substr(openParen + 1, closeParen - openParen - 1);
-            int result = calculate(expression);
+
+            // Modify expression | replace variable names with their values
+            std::string modifiedExpression = "";
+            std::string currentVarName = "";
+            for (char c : expression) {
+                if (std::isalpha(c)) {
+                    currentVarName += c; // Build variable name
+                }
+                else {
+                    if (!currentVarName.empty()) {
+                        // Replace variable name with its value
+                        int varValue = variables[currentVarName];
+                        modifiedExpression += std::to_string(varValue);
+                        currentVarName = ""; // Reset variable name
+                    }
+                    modifiedExpression += c; // Include operators and other chars
+                }
+            }
+            if (!currentVarName.empty()) {
+                // If there's a variable name left without an operator after it
+                int varValue = variables[currentVarName];
+                modifiedExpression += std::to_string(varValue);
+            }
+
+            int result = calculate(modifiedExpression);
             if (result != 1) {
                 // std::cout << result << std::endl; // not sure if result should get printed or just stored as variable so you can then use it later on in the code
             }
         }
+
         else if (line.find("gazo.lesen") != std::string::npos) {
             size_t openParen = line.find("(");
             size_t commaPos = line.find(",");
@@ -94,6 +144,19 @@ int main(int argc, char* argv[]) {
             }
 
             read(file_name, lines_to_read);
+        }
+        else if (line.find("gazo.var") != std::string::npos) {
+            size_t quoteStart = line.find("\"");
+            size_t quoteEnd = line.find("\"", quoteStart + 1);
+            if (quoteStart == std::string::npos || quoteEnd == std::string::npos || quoteEnd <= quoteStart) {
+                std::cerr << "[Gazo-Compiler Error] | Invalid syntax in gazo.var command" << std::endl;
+                return 1;
+            }
+            size_t equalPos = line.find("=");
+            std::string varName = line.substr(9, equalPos - 10); // Adjusted here
+            std::string value = line.substr(quoteStart + 1, quoteEnd - quoteStart - 1);
+            variables[varName] = std::stoi(value);
+            // std::cout << "Variable value: " << variables[varName] << std::endl;
         }
 
         else {

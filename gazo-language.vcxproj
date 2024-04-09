@@ -135,6 +135,7 @@
   <ItemGroup>
     <ClInclude Include="src\calculate.hpp" />
     <ClInclude Include="src\file_writing.hpp" />
+    <ClInclude Include="src\process_message.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

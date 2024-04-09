@@ -1,7 +1,19 @@
+// basic stuff
 gazo.sagen("Hello, world!")187
-gazo.rechnen(1+1+1)187
 gazo.sagen("gazo.rechnen(2+2)")187
-gazo.rechnen(100+1)187
 gazo.rechnen(1+1)187
+// purely writing gazo.rechnen will not make it print that but rather just return the value
+//math error examples
+gazo.rechnen(100+1)187
+gazo.rechnen(1+1+1)187
+// printing files
 gazo.lesen("2", "test.txt")187
+// variables
+gazo.var x = "10"187
+gazo.var y = "20"187
+gazo.rechnen(x+y)187
+gazo.sagen("gazo.rechnen(x+y)")187
+gazo.sagen('x')187
+// gazo.sagen(x)187 would return an invalid syntax error
+// unknown function error
 gazo.idk()187
